@@ -354,9 +354,9 @@ exports.sales_Expanse = async (req, res) => {
 
         }
         else {
-            return res.status(400).json({ status: false, message: "Invalid filter!" });
+            return res.status(200).json({ status: false, message: "Invalid filter!" });
         }
     } catch (error) {
-        return res.status(500).json({ status: false, message: "Server error", error: error.message });
+        return res.status(200).json({ status: false, message: "Server error", error: error.message });
     }
 };
