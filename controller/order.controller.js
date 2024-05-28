@@ -230,7 +230,7 @@ async function sendOrderConfirmationEmail(user_id, order) {
         const totalPrice = productDetails.reduce((acc, product) => acc + product.totalPrice, 0);
 
         // Compose email message
-        const emailMessage = `
+        const emailMessage = `  
             <!DOCTYPE html>
             <html lang="en">
             <head>
