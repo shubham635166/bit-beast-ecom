@@ -15,7 +15,7 @@ const nodemailer = require('nodemailer');
 //     const address = await Address.findOne({ _id: address_id, user_id:req.user._id });
 
 //     if (!address) {
-//         return res.status(404).json({ status: false, message: "Address not found!" });
+//         return res.status(200).json({ status: false, message: "Address not found!" });
 //     }
 
 //     if (!Array.isArray(order_Item) || order_Item.length === 0) {
@@ -37,11 +37,11 @@ const nodemailer = require('nodemailer');
 //         const product = await Product.findById(product_id);
 
 //         if (!product) {
-//             return res.status(404).json({ status: false, message: `Product not found for product_id: ${product_id}` });
+//             return res.status(200).json({ status: false, message: `Product not found for product_id: ${product_id}` });
 //         }
 
 //         if (item.quantity > product.stock ) {
-//             return res.status(404).json({ status: false, message: `stock not available for product_id: ${product_id}` });
+//             return res.status(200).json({ status: false, message: `stock not available for product_id: ${product_id}` });
 
 //         }
 
@@ -59,7 +59,7 @@ const nodemailer = require('nodemailer');
 
 //     try {
 //         const data = await order.save();
-//         return res.status(201).json({ status: true, message: "Order successfully added", order: data });
+//         return res.status(200).json({ status: true, message: "Order successfully added", order: data });
 //     } catch (error) {
 //         return res.status(200).json({ status: false, message: "Error adding order", error: error.message });
 //     }
@@ -79,7 +79,7 @@ exports.add_Order = async (req, res) => {
         const address = await Address.findOne({ _id: address_id, user_id: req.user._id });
 
         if (!address) {
-            return res.status(404).json({ status: false, message: "Address not found!" });
+            return res.status(200).json({ status: false, message: "Address not found!" });
         }
 
         // Validate order items
@@ -103,11 +103,11 @@ exports.add_Order = async (req, res) => {
             const product = await Product.findById(product_id);
 
             if (!product) {
-                return res.status(404).json({ status: false, message: `Product not found for product_id: ${product_id}` });
+                return res.status(200).json({ status: false, message: `Product not found for product_id: ${product_id}` });
             }
 
             if (quantity > product.stock) {
-                return res.status(404).json({ status: false, message: `Insufficient stock for product_id: ${product_id}` });
+                return res.status(200).json({ status: false, message: `Insufficient stock for product_id: ${product_id}` });
             }
 
             item.price = product.salePrice * quantity;
@@ -129,7 +129,7 @@ exports.add_Order = async (req, res) => {
         await sendOrderConfirmationEmail(req.user._id, savedOrder);
             
         // Return success response
-        return res.status(201).json({ status: true, message: "Order successfully added", order: savedOrder });
+        return res.status(200).json({ status: true, message: "Order successfully added", order: savedOrder });
     } catch (error) {
         // Return error response
         return res.status(200).json({ status: false, message: "Error adding order", error: error.message });
