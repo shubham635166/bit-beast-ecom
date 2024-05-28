@@ -66,63 +66,6 @@ const nodemailer = require('nodemailer');
 // };
 
 
-
-// exports.oderEmailSend = async (req, res) => {
-//     try {
-//         // Extract user_id from the request body
-//         const { user_id } = req.body;
-
-//         // Find the order using user_id
-//         const order = await Order.findOne({ user_id });
-
-//         // If order not found, return error response
-//         if (!order) {
-//             return res.status(404).json({ status: false, message: "Order not found." });
-//         }
-
-//         // Find the user using user_id to retrieve email
-//         const user = await User.findById(user_id);
-
-//         // If user not found or user email not available, return error response
-//         if (!user || !user.email) {
-//             return res.status(404).json({ status: false, message: "User email not found." });
-//         }
-
-//         // Compose email message
-//         const emailMessage = `
-//             <p>Dear ${user.name},</p>
-//             <p>Your order with ID ${order._id} has been confirmed.</p>
-//             <p>Thank you for shopping with us.</p>
-//         `;
-
-//         // Create Nodemailer transporter
-//         const transporter = nodemailer.createTransport({
-//             service: 'Gmail',
-//             auth: {
-//                 user: "priyankdarji87@gmail.com",
-//                 pass: "awyb rqkg rxiz woss",
-//             },// Specify your email sending service configuration here
-//         });
-
-//         // Send email
-//         await transporter.sendMail({
-//             from: 'priyankdarji87@gmail.com', // Sender's email address
-//             to: user.email, // Recipient's email address
-//             subject: 'Order Confirmation', // Email subject
-//             html: emailMessage // HTML body of the email
-//         });
-
-//         // Return success response
-//         return res.status(200).json({ status: true, message: "Order confirmation email sent successfully." });
-//     } catch (error) {
-//         // If any error occurs, return error response
-//         console.error("Error sending order confirmation email:", error);
-//         return res.status(200).json({ status: false, message: "Failed to send order confirmation email." });
-//     }
-// }
- 
-
-
 exports.add_Order = async (req, res) => {
     try {
         const { address_id, order_Item, payment } = req.body;
