@@ -298,7 +298,6 @@ async function sendOrderConfirmationEmail(user_id, order) {
             html: emailMessage
         });
 
-        console.log("Order confirmation email sent successfully to:", user.email);
     } catch (error) {
         console.error("Error sending order confirmation email:", error);
         throw new Error("Failed to send order confirmation email.");
