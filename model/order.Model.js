@@ -29,7 +29,7 @@ const orderSchema = new mongoose.Schema({
     ,
     totalPrice: {
         type: Number,
-        require: false
+        required: false
     },  
     status: {
         type: String,
@@ -39,6 +39,14 @@ const orderSchema = new mongoose.Schema({
     payment:{
         type:String,
         default:"COD"
+    },
+    shipping_Charge:{
+        type:Number,
+        required:false
+    },
+    GST:{
+        type:Number,
+        require:false
     }
 },
     {

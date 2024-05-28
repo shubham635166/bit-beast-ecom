@@ -5,70 +5,9 @@ const Product = require('../model/productModel');
 const User = require('../model/userModel');
 const nodemailer = require('nodemailer');
 
-// exports.add_Order = async (req, res) => {
-//     const { address_id, order_Item, payment } = req.body;
-
-//     if (!mongoose.isValidObjectId(address_id)) {
-//         return res.status(200).json({ status: false, message: "Invalid address_id!" });
-//     }
-
-//     const address = await Address.findOne({ _id: address_id, user_id:req.user._id });
-
-//     if (!address) {
-//         return res.status(200).json({ status: false, message: "Address not found!" });
-//     }
-
-//     if (!Array.isArray(order_Item) || order_Item.length === 0) {
-//         return res.status(200).json({ status: false, message: "Order item(s) missing!" });
-//     }
-
-//     let totalPrice = 0;
-//     for (const item of order_Item) {
-//         const { product_id, quantity } = item;
-
-//         if (!mongoose.isValidObjectId(product_id)) {
-//             return res.status(200).json({ status: false, message: `Invalid product_id: ${product_id}` });
-//         }
-
-//         if (typeof quantity !== 'number' || quantity <= 0) {
-//             return res.status(200).json({ status: false, message: `Invalid quantity for product_id: ${product_id}` });
-//         }
-
-//         const product = await Product.findById(product_id);
-
-//         if (!product) {
-//             return res.status(200).json({ status: false, message: `Product not found for product_id: ${product_id}` });
-//         }
-
-//         if (item.quantity > product.stock ) {
-//             return res.status(200).json({ status: false, message: `stock not available for product_id: ${product_id}` });
-
-//         }
-
-//         item.price = product.salePrice * quantity;
-//         totalPrice += item.price;
-//     }
-
-//     const order = new Order({
-//         user_id: req.user._id,
-//         address_id,
-//         order_Item,
-//         totalPrice,
-//         payment
-//     });
-
-//     try {
-//         const data = await order.save();
-//         return res.status(200).json({ status: true, message: "Order successfully added", order: data });
-//     } catch (error) {
-//         return res.status(200).json({ status: false, message: "Error adding order", error: error.message });
-//     }
-// };
-
-
 exports.add_Order = async (req, res) => {
     try {
-        const { address_id, order_Item, payment } = req.body;
+        const { address_id, order_Item, payment, shipping_Charge, GST } = req.body;
 
         // Validate address_id
         if (!mongoose.isValidObjectId(address_id)) {
@@ -114,20 +53,25 @@ exports.add_Order = async (req, res) => {
             totalPrice += item.price;
         }
 
+        totalPrice += GST;
+        totalPrice += shipping_Charge
+
         // Create order
         const order = new Order({
             user_id: req.user._id,
             address_id,
             order_Item,
             totalPrice,
-            payment
+            payment,
+            GST,
+            shipping_Charge
         });
 
         // Save order
         const savedOrder = await order.save();
 
         await sendOrderConfirmationEmail(req.user._id, savedOrder);
-            
+
         // Return success response
         return res.status(200).json({ status: true, message: "Order successfully added", order: savedOrder });
     } catch (error) {
@@ -247,3 +191,172 @@ async function sendOrderConfirmationEmail(user_id, order) {
     }
 }
 
+exports.sales_Expanse = async (req, res) => {
+
+    const { filter } = req.body;
+
+    try {
+        if (filter === "day") {
+            let dayData = [];
+            for (let i = 0; i < 12; i++) {
+                const startHour = new Date();
+                startHour.setTime(startHour.getTime() + (5.5 * 60 * 60 * 1000));
+                startHour.setHours(startHour.getHours() - i * 2);
+
+                const endHour = new Date(startHour);
+                endHour.setHours(endHour.getHours() - 2);
+
+                const orders = await Order.find({
+                    createdAt: { $gte: endHour, $lte: startHour }
+                }).sort('-createdAt');
+
+                let sales = 0;
+                let expense = 0;
+
+                orders.forEach(order => {
+                    sales += order.totalPrice;
+                    expense += order.shipping_Charge + order.GST;
+                });
+
+                startHour.setHours(startHour.getHours() - 5);
+                startHour.setMinutes(startHour.getMinutes() - 30);
+                endHour.setHours(endHour.getHours() - 5);
+                endHour.setMinutes(endHour.getMinutes() - 30);
+
+                const formattedStartHour = startHour.toLocaleString('en-US', { hour: 'numeric', hour12: true });
+                const formattedEndHour = endHour.toLocaleString('en-US', { hour: 'numeric', hour12: true });
+                const formattedDate = `${formattedEndHour} - ${formattedStartHour}`;
+
+                dayData.push({
+                    date: formattedDate,
+                    sales,
+                    expense
+                });
+            }
+
+            return res.status(200).json({
+                status: true,
+                label: 'Day',
+                data: dayData
+            });
+        }
+        else if (filter === "week") {
+            const lastWeekDate = new Date();
+            lastWeekDate.setDate(lastWeekDate.getDate() - 7);
+            const orders = await Order.find({ createdAt: { $gte: lastWeekDate } });
+            const label = 'Week';
+            const response = [];
+
+            for (let i = 0; i < 7; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const formattedDate = date.toLocaleDateString('en-US', { day: '2-digit' });
+                const formattedMonth = date.toLocaleDateString('en-US', { month: 'short' });
+
+                const dayOrders = orders.filter(order => {
+                    const orderDate = new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
+                    return orderDate === `${formattedMonth} ${formattedDate}`;
+                });
+
+                let sales = 0;
+                let expense = 0;
+
+                dayOrders.forEach(order => {
+                    sales += order.totalPrice;
+                    expense += order.shipping_Charge + order.GST;
+                });
+
+                response.push({
+                    Label: `${formattedDate} ${formattedMonth}`,
+                    Sales: sales,
+                    Expense: expense
+                });
+            }
+
+            return res.status(200).json({
+                status: true,
+                label,
+                data: response
+            });
+        }
+        else if (filter === "month") {
+            const currentDate = new Date();
+            const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 7);
+            const orders = await Order.find({ createdAt: { $gte: firstDayOfMonth } });
+            const label = 'Month';
+            const response = [];
+
+            for (let i = 0; i < 6; i++) {
+                const month = new Date(currentDate);
+                month.setMonth(currentDate.getMonth() - i);
+                const formattedMonth = month.toLocaleDateString('en-US', { month: 'short' });
+
+                const monthOrders = orders.filter(order => {
+                    const orderMonth = new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short' });
+                    return orderMonth === formattedMonth;
+                });
+
+                let sales = 0;
+                let expense = 0;
+
+                monthOrders.forEach(order => {
+                    sales += order.totalPrice;
+                    expense += order.shipping_Charge + order.GST;
+                });
+
+                response.push({
+                    Label: formattedMonth,
+                    Sales: sales,
+                    Expense: expense
+                });
+            }
+
+            return res.status(200).json({
+                status: true,
+                label,
+                data: response
+            });
+        }
+        else if (filter === "year") {
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const response = [];
+
+            for (let i = 0; i < 6; i++) {
+                const year = currentYear - i;
+                const orders = await Order.find({
+                    createdAt: {
+                        $gte: new Date(year, 0, 1),
+                        $lte: new Date(year, 11, 31, 23, 59, 59)
+                    }
+                });
+
+                let sales = 0;
+                let expense = 0;
+
+                orders.forEach(order => {
+                    sales += order.totalPrice;
+                    expense += order.shipping_Charge + order.GST;
+                });
+
+                response.push({
+                    Label: year.toString(),
+                    Sales: sales,
+                    Expense: expense
+                });
+            }
+
+            return res.status(200).json({
+                status: true,
+                label: 'Year',
+                data: response
+            });
+
+        }
+        else {
+            return res.status(400).json({ status: false, message: "Invalid filter!" });
+        }
+    } catch (error) {
+        return res.status(500).json({ status: false, message: "Server error", error: error.message });
+    }
+};
