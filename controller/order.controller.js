@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Address = require('../model/addressModel');
-const Order = require('../model/order.Model'); // Corrected the model name to `orderModel`
+const Order = require('../model/order.Model'); 
 const Product = require('../model/productModel');
 const User = require('../model/userModel');
 const nodemailer = require('nodemailer');
@@ -360,7 +360,6 @@ exports.sales_Expanse = async (req, res) => {
         return res.status(200).json({ status: false, message: "Server error", error: error.message });
     }
 };
-
 
 exports.compare_sale = async (req, res) => {
     const { filter } = req.body;
