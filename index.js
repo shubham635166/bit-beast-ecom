@@ -17,6 +17,6 @@ server().then(()=>{
     console.log(error);
 })
 app.use('/profile' , express.static(path.join(__dirname , 'upload')))
-app.listen(4000,()=>{
+app.listen(4000 , () =>{
     console.log("Server Is On");
-})
+})//, '192.168.1.16'

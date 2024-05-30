@@ -360,3 +360,210 @@ exports.sales_Expanse = async (req, res) => {
         return res.status(200).json({ status: false, message: "Server error", error: error.message });
     }
 };
+
+
+exports.compare_sale = async (req, res) => {
+    const { filter } = req.body;
+
+    try {
+        const currentDate = new Date();
+        currentDate.setHours(currentDate.getHours() + 5.5); // Convert to IST
+
+        let response = {
+            status: true,
+            label: '',
+            data: {
+                currentPeriod: {
+                    label: '',
+                    sales: 0,
+                    expense: 0
+                },
+                comparisonPeriod: {
+                    label: '',
+                    sales: 0,
+                    expense: 0
+                },
+                comparison: {
+                    compare: 0,
+                    percentage: '0%'
+                }
+            }
+        };
+
+        if (filter === "month") {
+            const currentMonth = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+
+            const startCurrentPeriod = new Date(currentYear, currentMonth - 5, 1);
+            startCurrentPeriod.setHours(5.5, 0, 0, 0); // Start of the day in IST
+            const endCurrentPeriod = new Date(currentYear, currentMonth + 1, 0);
+            endCurrentPeriod.setHours(23.5, 59, 59, 999); // End of the day in IST
+
+            const startComparisonPeriod = new Date(currentYear, currentMonth - 11, 1);
+            startComparisonPeriod.setHours(5.5, 0, 0, 0); // Start of the day in IST
+            const endComparisonPeriod = new Date(currentYear, currentMonth - 5, 0);
+            endComparisonPeriod.setHours(23.5, 59, 59, 999); // End of the day in IST
+
+            const currentOrders = await Order.find({
+                createdAt: { $gte: startCurrentPeriod, $lte: endCurrentPeriod }
+            });
+
+            const comparisonOrders = await Order.find({
+                createdAt: { $gte: startComparisonPeriod, $lte: endComparisonPeriod }
+            });
+
+            let currentPeriodSales = 0;
+            let currentExpense = 0;
+            let comparisonPeriodSales = 0;
+            let comparisonExpense = 0;
+
+            currentOrders.forEach(order => {
+                currentPeriodSales += order.totalPrice;
+                currentExpense += order.GST + order.shipping_Charge;
+            });
+
+            comparisonOrders.forEach(order => {
+                comparisonPeriodSales += order.totalPrice;
+                comparisonExpense += order.GST + order.shipping_Charge;
+            });
+
+            const salesDifference = currentPeriodSales - comparisonPeriodSales;
+            const salesPercentageChange = comparisonPeriodSales === 0
+                ? (currentPeriodSales === 0 ? '0%' : '100%')
+                : ((salesDifference / comparisonPeriodSales) * 100).toFixed(2) + '%';
+
+            response.label = 'Month';
+            response.data.currentPeriod.label = `${endCurrentPeriod.toLocaleString('en-IN', { month: 'short' })}-${startCurrentPeriod.toLocaleString('en-IN', { month: 'short' })}`;
+            response.data.currentPeriod.sales = currentPeriodSales;
+            response.data.currentPeriod.expense = currentExpense;
+            response.data.comparisonPeriod.label = `${endComparisonPeriod.toLocaleString('en-IN', { month: 'short' })}-${startComparisonPeriod.toLocaleString('en-IN', { month: 'short' })}`;
+            response.data.comparisonPeriod.sales = comparisonPeriodSales;
+            response.data.comparisonPeriod.expense = comparisonExpense;
+            response.data.comparison.compare = salesDifference;
+            response.data.comparison.percentage = salesPercentageChange;
+
+            return res.status(200).json(response);
+        } 
+        else if (filter === "year") {
+            const currentYear = currentDate.getFullYear();
+
+            const startCurrentPeriod = new Date(currentDate);
+            startCurrentPeriod.setFullYear(currentYear - 1);
+            startCurrentPeriod.setHours(5.5, 0, 0, 0); // Start of the day in IST
+
+            const endCurrentPeriod = new Date(currentDate);
+            endCurrentPeriod.setHours(23.5, 59, 59, 999); // End of the day in IST
+
+            const startComparisonPeriod = new Date(startCurrentPeriod);
+            startComparisonPeriod.setFullYear(startComparisonPeriod.getFullYear() - 1);
+            startComparisonPeriod.setHours(5.5, 0, 0, 0); // Start of the day in IST
+
+            const endComparisonPeriod = new Date(startCurrentPeriod);
+            endComparisonPeriod.setHours(23.5, 59, 59, 999); // End of the day in IST
+
+            const currentOrders = await Order.find({
+                createdAt: { $gte: startCurrentPeriod, $lte: endCurrentPeriod }
+            });
+
+            const comparisonOrders = await Order.find({
+                createdAt: { $gte: startComparisonPeriod, $lte: endComparisonPeriod }
+            });
+
+            let currentPeriodSales = 0;
+            let currentExpense = 0;
+            let comparisonPeriodSales = 0;
+            let comparisonExpense = 0;
+
+            currentOrders.forEach(order => {
+                currentPeriodSales += order.totalPrice;
+                currentExpense += order.GST + order.shipping_Charge;
+            });
+
+            comparisonOrders.forEach(order => {
+                comparisonPeriodSales += order.totalPrice;
+                comparisonExpense += order.GST + order.shipping_Charge;
+            });
+
+            const salesDifference = currentPeriodSales - comparisonPeriodSales;
+            const salesPercentageChange = comparisonPeriodSales === 0
+                ? (currentPeriodSales === 0 ? '0%' : '100%')
+                : ((salesDifference / comparisonPeriodSales) * 100).toFixed(2) + '%';
+
+            response.label = 'Year';
+            response.data.currentPeriod.label = `${endCurrentPeriod.getFullYear()}`;
+            response.data.currentPeriod.sales = currentPeriodSales;
+            response.data.currentPeriod.expense = currentExpense;
+            response.data.comparisonPeriod.label = `${endComparisonPeriod.getFullYear()}`;
+            response.data.comparisonPeriod.sales = comparisonPeriodSales;
+            response.data.comparisonPeriod.expense = comparisonExpense;
+            response.data.comparison.compare = salesDifference;
+            response.data.comparison.percentage = salesPercentageChange;
+
+            return res.status(200).json(response);
+        } 
+        else if (filter === "week") {
+            const endCurrentPeriod = new Date(currentDate);
+            endCurrentPeriod.setHours(23, 59, 59, 999); // End of the day in IST
+            const startCurrentPeriod = new Date(endCurrentPeriod);
+            startCurrentPeriod.setDate(startCurrentPeriod.getDate() - 6); // Start of the week
+            startCurrentPeriod.setHours(0, 0, 0, 0); // Start of the day in IST
+
+            const endComparisonPeriod = new Date(startCurrentPeriod);
+            endComparisonPeriod.setDate(endComparisonPeriod.getDate() - 1); // End of the previous week
+            endComparisonPeriod.setHours(23, 59, 59, 999); // End of the day in IST
+            const startComparisonPeriod = new Date(endComparisonPeriod);
+            startComparisonPeriod.setDate(startComparisonPeriod.getDate() - 6); // Start of the previous week
+            startComparisonPeriod.setHours(0, 0, 0, 0); // Start of the day in IST
+
+            const currentOrders = await Order.find({
+                createdAt: { $gte: startCurrentPeriod, $lte: endCurrentPeriod }
+            });
+
+            const comparisonOrders = await Order.find({
+                createdAt: { $gte: startComparisonPeriod, $lte: endComparisonPeriod }
+            });
+
+            let currentPeriodSales = 0;
+            let currentExpense = 0;
+            let comparisonPeriodSales = 0;
+            let comparisonExpense = 0;
+
+            currentOrders.forEach(order => {
+                currentPeriodSales += order.totalPrice;
+                currentExpense += order.GST + order.shipping_Charge;
+            });
+
+            comparisonOrders.forEach(order => {
+                comparisonPeriodSales += order.totalPrice;
+                comparisonExpense += order.GST + order.shipping_Charge;
+            });
+
+            const salesDifference = currentPeriodSales - comparisonPeriodSales;
+            const salesPercentageChange = comparisonPeriodSales === 0
+                ? (currentPeriodSales === 0 ? '0%' : '100%')
+                : ((salesDifference / comparisonPeriodSales) * 100).toFixed(2) + '%';
+
+            const dayFormat = { weekday: 'short' };
+            const currentStartDayLabel = startCurrentPeriod.toLocaleString('en-IN', dayFormat);
+            const currentEndDayLabel = endCurrentPeriod.toLocaleString('en-IN', dayFormat);
+            const comparisonStartDayLabel = startComparisonPeriod.toLocaleString('en-IN', dayFormat);
+            const comparisonEndDayLabel = endComparisonPeriod.toLocaleString('en-IN', dayFormat);
+
+            response.label = 'Week';
+            response.data.currentPeriod.label = `${currentEndDayLabel}-${currentStartDayLabel}`;
+            response.data.currentPeriod.sales = currentPeriodSales;
+            response.data.currentPeriod.expense = currentExpense;
+            response.data.comparisonPeriod.label = `${comparisonEndDayLabel}-${comparisonStartDayLabel}`;
+            response.data.comparisonPeriod.sales = comparisonPeriodSales;
+            response.data.comparisonPeriod.expense = comparisonExpense;
+            response.data.comparison.compare = salesDifference;
+            response.data.comparison.percentage = salesPercentageChange;
+
+            return res.status(200).json(response);
+        } else {
+            return res.status(200).json({ status: false, message: "Invalid filter!" });
+        }
+    } catch (error) {
+        return res.status(500).json({ status: false, message: "Server error", error: error.message });
+    }
+};
