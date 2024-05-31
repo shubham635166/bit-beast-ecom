@@ -19,7 +19,10 @@
     "dotenv": "^16.4.5",
     "email-validator": "^2.0.4",
     "express": "^4.18.3",
+    "express-fileupload": "^1.5.0",
     "firebase-admin": "^12.1.0",
+    "fs": "^0.0.1-security",
+    "image-size": "^1.1.1",
     "is-phone-number": "^1.0.4",
     "jsonwebtoken": "^9.0.2",
     "libphonenumber-js": "^1.10.60",
@@ -28,6 +31,8 @@
     "nodemailer": "^6.9.13",
     "otp-generator": "^4.0.1",
     "path": "^0.12.7",
-    "twilio": "^5.0.4"
+    "twilio": "^5.0.4",
+    "uuid": "^9.0.1",
+    "uuidv4": "^6.2.13"
   }
 }

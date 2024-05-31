@@ -1,28 +1,35 @@
 const express = require('express');
 const router = require('./router/router');
-
+const fileUpload = require('express-fileupload');
 const server = require('./database/productDataBase');
-const path = require('path')
-
+const path = require('path');
 const cookieParser = require('cookie-parser');
-const app = express()
 const bodyParser = require('body-parser');
-const cors = require('cors')
+const cors = require('cors');
 
-app.use(bodyParser.urlencoded({extended:false}));
-app.use(cors())
-app.use(express.json())
-app.use(router)
+const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(fileUpload());
 
-server().then(()=>{
-    console.log('Database successfully connected ');
-}).catch((error)=>{
+// Serve static files
+app.use('/profile/uploads', express.static(path.join(__dirname, 'profile/uploads')));
+
+// Routes
+app.use(router);
+
+// Database connection
+server().then(() => {
+    console.log('Database successfully connected');
+}).catch((error) => {
     console.log(error);
-})
+});
 
-app.use('/profile' , express.static(path.join(__dirname , 'upload')))
-
-app.listen(4000 , () =>{
-    console.log("Server Is On");
-})//, '192.168.1.16'
+// Start the server
+app.listen(4000, () => {
+    console.log("Server is running on port 4000");
+});

@@ -5,7 +5,6 @@ const ProductCategory = require('../model/productCategory')
 const ImgUrl = require('../model/imgModel')
 const Brand = require('../model/brandModel')
 const jwt = require('jsonwebtoken');
-const User = require('../model/userModel');
 const key = require('../middleware/secreteKey');
 const wishList = require('../model/wishListModel')
 

@@ -7,7 +7,7 @@ const { user, login, userUpdate, getData, changePassword, userDelete, userData, 
 
 const { productCategory, updateCategory, deleteCategory, getCategory } = require('../controller/categoryController');
 
-const { upload, deleteImage, getImage, imgUpdate } = require('../controller/imgController');
+const { upload, deleteImage, getImage, imgUpdate, imageCreate, saveMedia, deleteMedia } = require('../controller/imgController');
 
 const { protect } = require('../middleware/userMiddleware');
 
@@ -15,7 +15,7 @@ const { cartAdd, getCart , removeCart , removeCartProduct, applyCoupon, findRevi
 
 const { createCoupon, updateCoupon, getAllCoupon, getIdWithCoupon, deleteCoupon } = require('../controller/couponController');
 
-const { createAddress, addNewAddress, updateAddress, getAddress, getOneAddress, deleteAddress } = require('../controller/addressController');
+const { createAddress, updateAddress, getAddress, getOneAddress, deleteAddress } = require('../controller/addressController');
 
 const { addBrand, updateBrand, getBrand, getOneBrand, deleteBrand } = require('../controller/brandController');
 
@@ -26,7 +26,7 @@ const { add_wishList, removeWishListProduct, getWishList, removeWishList } = req
 const { addSubscribe, updateSubscribe, deleteSubscribe, getAllSubscribe, getOneSubscribe } = require('../controller/subscribeController');
 const { addReview, updateReview, deleteReview, getReview, getOneReview } = require('../controller/reviewController');
 const { addProductOne, updateProductOne, productDeleteOne, getAllProductOne, getOneProductOne, variationAddOne, task } = require('../controller/productOneController');
-const { sendOtp, verifyOtp, whatsapp } = require('../controller/otpController');
+const { sendOtp, verifyOtp } = require('../controller/otpController');
 const { send_Notification, get_Notification, pre_view_notification, delete_many_notification, delete_One_Notification, update_Notification } = require('../controller/notificationController');
 const { add_Tag, update_Tag, get_Tag, get_One_Tag, delete_Tag } = require('../controller/product.Tag.Controller');
 const { add_Order, sales_Expanse, compare_sale } = require('../controller/order.controller');
@@ -72,10 +72,14 @@ router.get('/getVariationWithId', getVariationWithId)
 
 //img
 
-router.post("/img", upload)
-router.delete("/imgDelete", deleteImage)
-router.get("/imageGet", getImage)
-router.put("/imgUpdate", imgUpdate)
+// router.post("/img", upload)
+// router.delete("/imgDelete", deleteImage)
+// router.get("/imageGet", getImage)
+// router.put("/imgUpdate", imgUpdate)
+
+router.post('/img',imageCreate)
+router.post('/imgUpdate',saveMedia)
+router.post('/imgDelete',deleteMedia)
 
 //productCategory
 
