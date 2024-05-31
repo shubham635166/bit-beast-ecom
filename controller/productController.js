@@ -4,6 +4,10 @@ const Review = require('../model/reviewModel')
 const ProductCategory = require('../model/productCategory')
 const ImgUrl = require('../model/imgModel')
 const Brand = require('../model/brandModel')
+const jwt = require('jsonwebtoken');
+const User = require('../model/userModel');
+const key = require('../middleware/secreteKey');
+const wishList = require('../model/wishListModel')
 
 // product
 
@@ -139,10 +143,10 @@ exports.product = async (req, res) => {
 exports.productUpdate = async (req, res) => {
     try {
 
-        const { name ,variation, product_id, regularPrice, salePrice, description, img_id, category_id, slug, sku, isPublished, isFeatured, isDisable, isDeleted, stock, brand_id } = req.body;
+        const { name, variation, product_id, regularPrice, salePrice, description, img_id, category_id, slug, sku, isPublished, isFeatured, isDisable, isDeleted, stock, brand_id } = req.body;
 
         if (!product_id) {
-            return res.status(200).json({status:false , message : "product id required!"})
+            return res.status(200).json({ status: false, message: "product id required!" })
         }
 
         if (mongoose.isValidObjectId(product_id)) {
@@ -188,74 +192,74 @@ exports.productUpdate = async (req, res) => {
             if (product && product.isDeleted === false) {
                 let discount;
 
-            if (regularPrice && salePrice) {
-                discount = Math.round((regularPrice - salePrice) / regularPrice * 100);
-            } else {
-                discount = product.discount;
-            }
+                if (regularPrice && salePrice) {
+                    discount = Math.round((regularPrice - salePrice) / regularPrice * 100);
+                } else {
+                    discount = product.discount;
+                }
 
-            if (name) {
-                product.name = name;
-            }
+                if (name) {
+                    product.name = name;
+                }
 
-            if (regularPrice) {
-                product.regularPrice = regularPrice;
-            }
+                if (regularPrice) {
+                    product.regularPrice = regularPrice;
+                }
 
-            if (salePrice) {
-                product.salePrice = salePrice;
-            }
+                if (salePrice) {
+                    product.salePrice = salePrice;
+                }
 
-            if (description) {
-                product.description = description;
-            }
+                if (description) {
+                    product.description = description;
+                }
 
-            product.discount = discount;
+                product.discount = discount;
 
-            if (img_id) {
-                product.img_id = img_id;
-            }
+                if (img_id) {
+                    product.img_id = img_id;
+                }
 
-            if (category_id) {
-                product.category_id = category_id;
-            }
+                if (category_id) {
+                    product.category_id = category_id;
+                }
 
-            if (slug) {
-                const modifiedSlug = slug ? slug.replace(/\s+/g, '-') : product.slug;
-                product.slug = modifiedSlug;
-            }
+                if (slug) {
+                    const modifiedSlug = slug ? slug.replace(/\s+/g, '-') : product.slug;
+                    product.slug = modifiedSlug;
+                }
 
-            if (sku) {
-                product.sku = sku;
-            }
+                if (sku) {
+                    product.sku = sku;
+                }
 
-            if (isPublished !== undefined) {
-                product.isPublished = isPublished;
-            }
+                if (isPublished !== undefined) {
+                    product.isPublished = isPublished;
+                }
 
-            if (isFeatured !== undefined) {
-                product.isFeatured = isFeatured;
-            }
+                if (isFeatured !== undefined) {
+                    product.isFeatured = isFeatured;
+                }
 
-            if (isDisable !== undefined) {
-                product.isDisable = isDisable;
-            }
+                if (isDisable !== undefined) {
+                    product.isDisable = isDisable;
+                }
 
-            if (isDeleted !== undefined) {
-                product.isDeleted = isDeleted;
-            }
+                if (isDeleted !== undefined) {
+                    product.isDeleted = isDeleted;
+                }
 
-            if (stock !== undefined) {
-                product.stock = stock;
-            }
+                if (stock !== undefined) {
+                    product.stock = stock;
+                }
 
-            if (brand_id) {
-                product.brand_id = brand_id;
-            }
+                if (brand_id) {
+                    product.brand_id = brand_id;
+                }
 
-            product.updatedAt = new Date();
+                product.updatedAt = new Date();
 
-            await product.save();
+                await product.save();
 
                 return res.status(200).json({ status: true, message: "product update successfully", product: product });
 
@@ -350,16 +354,31 @@ exports.productGet = async (req, res) => {
     try {
         const { type, startingPrice, endingPrice, category_id, isDeleted, brand_id, name } = req.body;
 
+        let user_id = null
+
+        if (req.headers.cookie) {
+            const token = req.headers.cookie;
+
+            const tokenParts = token.split(';').find(part => part.trim().startsWith('token='));
+
+            const tokenValue = tokenParts.trim().substring(6);
+
+            const decodedData = jwt.verify(tokenValue, key.key);
+            user_id = decodedData.id;
+
+        }
+
         let matchStage = {};
 
+
         if (category_id && !mongoose.isValidObjectId(category_id)) {
-            return res.status(200).json({status:false , message : "invalid category id!"});
+            return res.status(200).json({ status: false, message: "invalid category id!" });
         }
 
         if (brand_id && !mongoose.isValidObjectId(brand_id)) {
-            return res.status(200).json({status:false , message : "invalid brand id!"}) 
+            return res.status(200).json({ status: false, message: "invalid brand id!" })
         }
- 
+
         if (type !== undefined) matchStage.type = type;
         if (startingPrice !== undefined && endingPrice !== undefined) {
             matchStage.salePrice = { $gte: startingPrice, $lte: endingPrice };
@@ -379,7 +398,7 @@ exports.productGet = async (req, res) => {
                     as: 'category_id'
                 }
             },
-            { $unwind: { path: '$category_id'} },
+            { $unwind: { path: '$category_id' } },
             {
                 $lookup: {
                     from: 'imgurls',
@@ -397,10 +416,20 @@ exports.productGet = async (req, res) => {
                     as: 'brand_id'
                 }
             },
-            { $unwind: { path: '$brand_id'} }
+            { $unwind: { path: '$brand_id' } }
         ];
 
         const products = await Product.aggregate(pipeline);
+
+        if (user_id) {
+            const wish = await wishList.findOne({ user_id: user_id })
+            if (wish) {
+                const wishProduct = wish.products.map(product => product.product_id.toString());
+                products.forEach(product => {
+                    product.isWishList = wishProduct.some(wish_id => wish_id === product._id.toString())
+                })
+            }
+        }
 
         return res.status(200).json({
             status: true,
@@ -1174,7 +1203,7 @@ exports.multiple_product_update = async (req, res) => {
 
             // img
 
-            if (img_id &&!mongoose.isValidObjectId(img_id)) {
+            if (img_id && !mongoose.isValidObjectId(img_id)) {
                 return res.status(200).json({ product_id, status: false, message: "Invalid img Id!" });
             }
 
@@ -1201,7 +1230,8 @@ exports.multiple_product_update = async (req, res) => {
                     return res.status(200).json({ product_id, status: false, message: "Simple product should not have variations!" });
                 }
             }
-            else if (product.type === "variation") {z
+            else if (product.type === "variation") {
+                z
                 if (!variations || variations.length === 0) {
                     return res.status(200).json({ product_id, status: false, message: "Variation product must include variations!" });
                 }
