@@ -32,7 +32,6 @@ const { add_Tag, update_Tag, get_Tag, get_One_Tag, delete_Tag } = require('../co
 const { add_Order, sales_Expanse, compare_sale } = require('../controller/order.controller');
 
 
-
 // router.use('/userData',protect)
 
 router.post("/user", user)
@@ -206,7 +205,5 @@ router.post('/taste', filter_Data)
 
 router.post('/sales' , sales_Expanse)
 router.post('/compare' , compare_sale)
-
-
 
 module.exports = router;

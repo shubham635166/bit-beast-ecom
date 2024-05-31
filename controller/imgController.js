@@ -12,7 +12,7 @@ exports.imageCreate = async (req, res, next) => {
     try {
 
         if (!req.files || !req.files.file) {
-            return res.status(400).json({ status: false, message: "No file uploaded" });
+            return res.status(200).json({ status: false, message: "No file uploaded" });
         }
 
         const file = req.files.file;
@@ -51,11 +51,11 @@ exports.imageCreate = async (req, res, next) => {
         if (result) {
             return res.status(200).json({ status: true, message: "Profile added successfully" });
         } else {
-            return res.status(400).json({ status: false, message: "Add profile failed!" });
+            return res.status(200).json({ status: false, message: "Add profile failed!" });
         }
     } catch (error) {
         console.error("Error adding profile:", error);
-        return res.status(500).json({ status: false, message: "Internal server error!" });
+        return res.status(200).json({ status: false, message: "Internal server error!" });
     }
 };
 
@@ -63,14 +63,14 @@ exports.saveMedia = async (req, res, next) => {
   const { alt_text, profile_id } = req.body;
   try {
       if (!mongoose.isValidObjectId(profile_id)) {
-          return res.status(400).json({ status: false, message: "Invalid profile id!" });
+          return res.status(200).json({ status: false, message: "Invalid profile id!" });
       }
       const profile = await Image.findById(profile_id);
       if (!profile) {
           return res.status(404).json({ status: false, message: "profile not found" });
       }
       if (!req.files || !req.files.file) {
-          return res.status(400).json({ status: false, message: "File not found" });
+          return res.status(200).json({ status: false, message: "File not found" });
       }
       const file = req.files.file;
       const fileName = file.name;
@@ -80,7 +80,7 @@ exports.saveMedia = async (req, res, next) => {
       file.mv(tempFilePath, async (err) => {
           if (err) {
               console.error("Error saving file:", err);
-              return res.status(500).json({ status: false, message: "Error saving file" });
+              return res.status(200).json({ status: false, message: "Error saving file" });
           }
           const newFileName = path.basename(tempFilePath); // Get the new file name
           // Update profile details
@@ -98,19 +98,20 @@ exports.saveMedia = async (req, res, next) => {
           } else {
               profile.dimension = null;
           }
+          profile.updatedAt = new Date()
           await profile.save();
           return res.status(200).json({ status: true, message: "profile updated successfully!" });
       });
   } catch (error) {
       console.error("Error updating profile:", error);
-      return res.status(500).json({ status: false, message: "Internal Server Error!" });
+      return res.status(200).json({ status: false, message: "Internal Server Error!" });
   }
 };
 exports.deleteMedia = async (req, res, next) => {
   const { media_id } = req.body;
   try {
       if (!mongoose.isValidObjectId(media_id)) {
-          return res.status(400).json({ status: false, message: "Invalid media id!" });
+          return res.status(200).json({ status: false, message: "Invalid media id!" });
       }
       const media = await Image.findById(media_id);
       if (!media) {
@@ -131,6 +132,6 @@ exports.deleteMedia = async (req, res, next) => {
       }
   } catch (error) {
       console.error("Error deleting media:", error);
-      return res.status(500).json({ status: false, message: "Internal server error!" });
+      return res.status(200).json({ status: false, message: "Internal server error!" });
   }
 };

@@ -367,7 +367,9 @@ exports.productGet = async (req, res) => {
 
         }
 
-        let matchStage = {};
+        let matchStage = {
+            isDeleted : false
+        };
 
 
         if (category_id && !mongoose.isValidObjectId(category_id)) {
