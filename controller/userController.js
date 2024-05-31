@@ -7,7 +7,7 @@ const Cart = require('../model/cart');
 const Address = require('../model/addressModel');
 const wishList = require('../model/wishListModel');
 const return_Request = require('../model/returnRequestModel');
-const senToken = require('../middleware/sendToken')
+const sendToken = require('../middleware/sendToken')
 
 function validatePhoneNumber(phoneNumber) {
   try {
@@ -56,7 +56,7 @@ exports.user = async (req, res) => {
           return res.status(200).json({status:true , message : "user successfully add" , user:doc})
           const saved_user = await User.findOne({ email: email })
 
-          senToken(guest, 200, res);
+          sendToken(guest, 200, res);
         } else {
           res.send({ "status": "failed", "message": "Password and Confirm Password doesn't match" })
         }
@@ -89,7 +89,7 @@ exports.login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password)
         if (user.email === email && isMatch) {
 
-          senToken(user, 200, res);
+          sendToken(user, 200, res);
 
         } else {
           res.send({ "status": "failed", "message": "Email or Password is not Valid" })
@@ -387,7 +387,7 @@ exports.addGuestUser = async (req, res) => {
     //     httpOnly: true,
     // });
 
-    senToken(guest, 200, res);
+    sendToken(guest, 200, res);
     // res.status(200).json({ status: true, message: "Guest user created successfully", token: token });
   }
   catch (error) {
