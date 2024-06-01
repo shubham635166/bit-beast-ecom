@@ -30,6 +30,7 @@ const { sendOtp, verifyOtp } = require('../controller/otpController');
 const { send_Notification, get_Notification, pre_view_notification, delete_many_notification, delete_One_Notification, update_Notification } = require('../controller/notificationController');
 const { add_Tag, update_Tag, get_Tag, get_One_Tag, delete_Tag } = require('../controller/product.Tag.Controller');
 const { add_Order, sales_Expanse, compare_sale } = require('../controller/order.controller');
+const { createApp, updateApp, getApp } = require('../controller/app.controller');
 
 
 // router.use('/userData',protect)
@@ -205,5 +206,12 @@ router.post('/taste', filter_Data)
 
 router.post('/sales' , sales_Expanse)
 router.post('/compare' , compare_sale)
+
+
+// app
+
+router.post('/app' ,createApp)
+router.post('/appUpdate' , updateApp)
+router.post('/appGet' , getApp)
 
 module.exports = router;

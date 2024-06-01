@@ -12,6 +12,10 @@ const appSchema = new mongoose.Schema({
     loading: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "ImgUrl"
+    },
+    favicon:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ImgUrl"
     }
 },
 {
@@ -26,36 +30,4 @@ const appSchema = new mongoose.Schema({
 });
 
 const App = mongoose.model('App', appSchema);
-
-// Function to ensure default logos are set
-async function ensureDefaultLogos(defaultHeaderId, defaultFooterId, defaultLoadingId) {
-    const app = await App.findOne(); // Assuming you have only one App document
-    if (!app) {
-        console.log("App document not found.");
-        return;
-    }
-
-    let updated = false;
-
-    if (!app.header) {
-        app.header = defaultHeaderId;
-        updated = true;
-    }
-    if (!app.footer) {
-        app.footer = defaultFooterId;
-        updated = true;
-    }
-    if (!app.loading) {
-        app.loading = defaultLoadingId;
-        updated = true;
-    }
-
-    if (updated) {
-        await app.save();
-        console.log("App logos updated with default values.");
-    } else {
-        console.log("App logos are already set.");
-    }
-}
-
-module.exports = { App, ensureDefaultLogos };
+module.exports = App

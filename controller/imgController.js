@@ -32,7 +32,7 @@ exports.imageCreate = async (req, res, next) => {
             fileDetails = sizeOf(tempFilePath);
         }
 
-        const url = `profile/uploads/${uniqueFilename}`;
+        const url = `/profile/uploads/${uniqueFilename}`;
 
         const profileObject = {
             altText: alt_text,
@@ -86,7 +86,7 @@ exports.saveMedia = async (req, res, next) => {
           // Update profile details
           profile.altText = alt_text;
           profile.name = fileName;
-          profile.url = `profile/uploads/${newFileName}`;
+          profile.url = `/profile/uploads/${newFileName}`;
           profile.type = mime.lookup(fileName);
           profile.size = file.size;
           if (profile.type && profile.type.startsWith("image")) {
