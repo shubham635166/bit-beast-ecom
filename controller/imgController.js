@@ -67,7 +67,7 @@ exports.saveMedia = async (req, res, next) => {
       }
       const profile = await Image.findById(profile_id);
       if (!profile) {
-          return res.status(404).json({ status: false, message: "profile not found" });
+          return res.status(200).json({ status: false, message: "profile not found" });
       }
       if (!req.files || !req.files.file) {
           return res.status(200).json({ status: false, message: "File not found" });
@@ -115,7 +115,7 @@ exports.deleteMedia = async (req, res, next) => {
       }
       const media = await Image.findById(media_id);
       if (!media) {
-          return res.status(404).json({ status: false, message: "Media not found" });
+          return res.status(200).json({ status: false, message: "Media not found" });
       }
       // Remove file from storage path if it exists
       if (media.url) {
