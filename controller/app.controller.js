@@ -1,6 +1,6 @@
 const { default: mongoose } = require('mongoose');
-const App = require('../model/app.model')
-const Image = require('../model/imgModel')
+const App = require('../model/app.model');
+const Image = require('../model/imgModel');
 
 exports.createApp = async(req,res)=>{
     const {image_id} = req.body
