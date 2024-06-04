@@ -580,14 +580,15 @@ exports.findOrderReviewProduct = async (req, res) => {
 
         // Loop through each cart item
         cartProducts.forEach(cartItem => {
-    
+            
             const reviewedProducts = cartItem.order_Item.map(product => {
                 const reviewExists = reviews.some(review => review.product_id.toString() === product.product_id.toString());
 
-                const returnRequest = returnRequests.find(request => request.order_item_id && request.order_item_id.toString() === product._id.toString());
-                const returnProduct = returnRequest ? true : false;
-
-                return {
+                
+                    const returnRequest = returnRequests.find(request => request.order_item_id && request.order_id.toString() === product._id.toString());
+                    const returnProduct = returnRequest ? true : false;
+                
+                return { 
                     ...product.toObject(),
                     reviewed: reviewExists,
                     returnProductRequest: returnProduct
