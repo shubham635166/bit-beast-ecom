@@ -4,6 +4,8 @@ const Order = require('../model/order.Model');
 const Product = require('../model/productModel');
 const User = require('../model/userModel');
 const nodemailer = require('nodemailer');
+const Review = require('../model/reviewModel')
+const Return = require('../model/returnRequestModel')
 
 exports.add_Order = async (req, res) => {
     try {
@@ -564,5 +566,44 @@ exports.compare_sale = async (req, res) => {
         }
     } catch (error) {
         return res.status(500).json({ status: false, message: "Server error", error: error.message });
+    }
+};
+
+exports.findOrderReviewProduct = async (req, res) => {
+    try {
+        const reviews = await Review.find({ user_id: req.user._id });
+        const cartProducts = await Order.find({ user_id: req.user._id });
+        const returnRequests = await Return.find({ user_id: req.user._id });
+
+        // Initialize an empty cart object
+        let reviewedCartProducts = {};
+
+        // Loop through each cart item
+        cartProducts.forEach(cartItem => {
+    
+            const reviewedProducts = cartItem.order_Item.map(product => {
+                const reviewExists = reviews.some(review => review.product_id.toString() === product.product_id.toString());
+
+                const returnRequest = returnRequests.find(request => request.order_item_id && request.order_item_id.toString() === product._id.toString());
+                const returnProduct = returnRequest ? true : false;
+
+                return {
+                    ...product.toObject(),
+                    reviewed: reviewExists,
+                    returnProductRequest: returnProduct
+                };
+            });
+
+            // Add the reviewed products to the cart object
+            reviewedCartProducts = {
+                ...reviewedCartProducts,
+                cart_item: reviewedProducts
+            };
+        });
+
+        // Send the response with the reviewed cart
+        res.status(200).json({ status: true, reviewedCartProducts });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };

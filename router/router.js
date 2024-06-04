@@ -29,7 +29,7 @@ const { addProductOne, updateProductOne, productDeleteOne, getAllProductOne, get
 const { sendOtp, verifyOtp } = require('../controller/otpController');
 const { send_Notification, get_Notification, pre_view_notification, delete_many_notification, delete_One_Notification, update_Notification } = require('../controller/notificationController');
 const { add_Tag, update_Tag, get_Tag, get_One_Tag, delete_Tag } = require('../controller/product.Tag.Controller');
-const { add_Order, sales_Expanse, compare_sale } = require('../controller/order.controller');
+const { add_Order, sales_Expanse, compare_sale, findOrderReviewProduct } = require('../controller/order.controller');
 const { createApp, updateApp, getApp } = require('../controller/app.controller');
 
 
@@ -194,6 +194,7 @@ router.post('/delete_tag',delete_Tag)
 // order
 
 router.post('/order' , protect , add_Order)
+router.post('/findOrderReviewProduct' , protect , findOrderReviewProduct)
 
 
 router.post('/task', task)

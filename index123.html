@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProLand Headphones</title>
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: white;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5em;
+    color: #800080;
+    font-weight: bold;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+}
+
+.order-button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.hero {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: white;
+}
+
+.hero h1 {
+    font-size: 4em;
+    color: #ff00ff;
+    margin-bottom: 20px;
+}
+
+.hero img {
+    width: 300px;
+    height: auto;
+    margin: 20px 0;
+}
+
+.features {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.feature h3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.feature p {
+    font-size: 1em;
+    color: #555;
+}
+
+.video-button {
+    background-color: #ff00ff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 50px;
+}
+
+.review {
+    background-color: #ff00ff;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.review a {
+    color: white;
+    text-decoration: underline;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">ProLand</div>
+            <ul>
+                <li><a href="#">Overview</a></li>
+                <li><a href="#">Features</a></li>
+                <li><a href="#">Technology</a></li>
+                <li><a href="#">Design</a></li>
+                <li><a href="#">Review</a></li>
+                <li><a href="#">Pricing</a></li>
+            </ul>
+            <button class="order-button">Order now</button>
+        </nav>
+    </header>
+    <main>
+        <section class="hero">
+            <h1>listening</h1>
+            <img src="headphones.png" alt="Headphones">
+            <div class="features">
+                <div class="feature">
+                    <h3>Audio technology</h3>
+                    <p>Adaptive EQ</p>
+                </div>
+                <div class="feature">
+                    <h3>Effective sensors</h3>
+                    <p>Accelerometer</p>
+                </div>
+            </div>
+            <button class="video-button">Play Video</button>
+        </section>
+        <section class="review">
+            <span>⭐⭐⭐⭐⭐</span>
+            <p>The best rated headphone on <a href="#">Amazon.com</a></p>
+        </section>
+    </main>
+    <script >
+        document.querySelector('.video-button').addEventListener('click', () => {
+    alert('Play Video button clicked!');
+});
+
+    </script>
+</body>
+</html>
