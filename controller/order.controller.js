@@ -580,25 +580,29 @@ exports.findOrderReviewProduct = async (req, res) => {
 
         // Loop through each cart item
         cartProducts.forEach(cartItem => {
-            
-            const reviewedProducts = cartItem.order_Item.map(product => {
-                const reviewExists = reviews.some(review => review.product_id.toString() === product.product_id.toString());
+            const returnRequestForOrder = returnRequests.some(request => 
+                request.order_id && request.order_id.toString() === cartItem._id.toString() && request.type === 'order'
+            );
 
-                
-                    const returnRequest = returnRequests.find(request => request.order_item_id && request.order_id.toString() === product._id.toString());
-                    const returnProduct = returnRequest ? true : false;
-                
+            const reviewedProducts = cartItem.order_Item.map(product => {
+                const reviewExists = reviews.some(review => 
+                    review.product_id && review.product_id.toString() === product.product_id.toString()
+                );
+                const returnRequest = returnRequestForOrder || returnRequests.some(request => 
+                    request.order_item_id && request.order_item_id.toString() === product._id.toString() && request.type === 'product'
+                );
+
                 return { 
                     ...product.toObject(),
                     reviewed: reviewExists,
-                    returnProductRequest: returnProduct
+                    returnProductRequest: returnRequest
                 };
             });
 
             // Add the reviewed products to the cart object
             reviewedCartProducts = {
                 ...reviewedCartProducts,
-                cart_item: reviewedProducts
+                order_item: reviewedProducts
             };
         });
 
