@@ -1,159 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProLand Headphones</title>
+    <title>Order Summary</title>
     <style>
-        * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #E6E6F6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
 
-body {
-    background-color: #f4f4f4;
-    color: #333;
-}
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 700px;
+            width: 100%;
+        }
 
-header {
-    background-color: white;
-    padding: 10px 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+        .header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
 
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .header img {
+            max-width: 40px;
+        }
 
-.logo {
-    font-size: 1.5em;
-    color: #800080;
-    font-weight: bold;
-}
+        .order-details {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+            color: #888;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
 
-nav ul {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-}
+        .order-details-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
 
-nav ul li a {
-    text-decoration: none;
-    color: #333;
-}
+        .order-details-header img {
+            max-width: 20px;
+            margin-right: 10px;
+        }
 
-.order-button {
-    background-color: #333;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 5px;
-}
+        .order-details div {
+            margin: 5px 0;
+        }
 
-.hero {
-    text-align: center;
-    padding: 50px 20px;
-    background-color: white;
-}
+        .order-details strong {
+            color: #333;
+        }
 
-.hero h1 {
-    font-size: 4em;
-    color: #ff00ff;
-    margin-bottom: 20px;
-}
+        .order-details div span {
+            color: #888;
+            margin-left: 10px;
+        }
 
-.hero img {
-    width: 300px;
-    height: auto;
-    margin: 20px 0;
-}
+        .order-items {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
 
-.features {
-    display: flex;
-    justify-content: space-around;
-    margin: 20px 0;
-}
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 0;
+        }
 
-.feature h3 {
-    font-size: 1.2em;
-    margin-bottom: 10px;
-}
+        .order-item:last-child {
+            border-bottom: none;
+        }
 
-.feature p {
-    font-size: 1em;
-    color: #555;
-}
+        .order-item img {
+            max-width: 60px;
+            border-radius: 5px;
+        }
 
-.video-button {
-    background-color: #ff00ff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 50px;
-}
+        .item-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
 
-.review {
-    background-color: #ff00ff;
-    color: white;
-    text-align: center;
-    padding: 20px;
-    margin-top: 20px;
-}
+        .item-info div {
+            margin-left: 10px;
+        }
 
-.review a {
-    color: white;
-    text-decoration: underline;
-}
+        .item-title {
+            font-weight: bold;
+            color: #333;
+        }
 
+        .totals {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+
+        .totals div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .totals div strong {
+            font-weight: bold;
+        }
+
+        .totals .total {
+            font-weight: bold;
+            display: flex;
+            font-size: 18px;
+            color: #333;
+            border-top: 1px solid #eee;
+        }
+
+        .delivery-address {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .delivery-address div {
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            font-size: 14px;
+            color: #777;
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
-<body>
-    <header>
-        <nav>
-            <div class="logo">ProLand</div>
-            <ul>
-                <li><a href="#">Overview</a></li>
-                <li><a href="#">Features</a></li>
-                <li><a href="#">Technology</a></li>
-                <li><a href="#">Design</a></li>
-                <li><a href="#">Review</a></li>
-                <li><a href="#">Pricing</a></li>
-            </ul>
-            <button class="order-button">Order now</button>
-        </nav>
-    </header>
-    <main>
-        <section class="hero">
-            <h1>listening</h1>
-            <img src="headphones.png" alt="Headphones">
-            <div class="features">
-                <div class="feature">
-                    <h3>Audio technology</h3>
-                    <p>Adaptive EQ</p>
-                </div>
-                <div class="feature">
-                    <h3>Effective sensors</h3>
-                    <p>Accelerometer</p>
-                </div>
-            </div>
-            <button class="video-button">Play Video</button>
-        </section>
-        <section class="review">
-            <span>⭐⭐⭐⭐⭐</span>
-            <p>The best rated headphone on <a href="#">Amazon.com</a></p>
-        </section>
-    </main>
-    <script >
-        document.querySelector('.video-button').addEventListener('click', () => {
-    alert('Play Video button clicked!');
-});
 
-    </script>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://via.placeholder.com/40" alt="Logo">
+        </div>
+        <div class="order-details">
+            <div class="order-details-header">
+                <img src="https://via.placeholder.com/20" alt="Order Icon">
+                <strong>Order ID:</strong> #3489
+            </div>
+            <div class="">
+                <div><strong>Order date:</strong> <span>May 15, 2024</span></div>
+                <div><strong>Estimated delivery date:</strong> <span>May 22, 2024</span></div>
+                <div><strong>Payment:</strong> <img src="https://img.icons8.com/color/48/000000/mastercard.png"
+                        alt="MasterCard" style="max-width: 20px; vertical-align: middle;"></div>
+            </div>
+        </div>
+        <div class="order-items">
+            <div class="order-item">
+                <div class="item-info">
+                    <img src="https://via.placeholder.com/60" alt="Take The Risk">
+                    <div>
+                        <div class="item-title">Take The Risk</div>
+                        <div>A book about measuring risks in life.</div>
+                    </div>
+                </div>
+                <div>NGN 6,000.00</div>
+            </div>
+            <div class="order-item">
+                <div class="item-info">
+                    <img src="https://via.placeholder.com/60" alt="Little Black Book">
+                    <div>
+                        <div class="item-title">Little Black Book</div>
+                        <div>A black people's guide to being black.</div>
+                    </div>
+                </div>
+                <div>NGN 4,500.00</div>
+            </div>
+        </div>
+        <div class="totals">
+            <div>
+                <div>Subtotal</div>
+                <div>NGN 10,500.00</div>
+            </div>
+            <div>
+                <div>Delivery fee</div>
+                <div>NGN 1,500.00</div>
+            </div>
+            <div>
+                <div>Taxes (5%)</div>
+                <div>NGN 600.00</div>
+            </div>
+            <div class="total">
+                <div>Total</div>
+                <div>NGN 12,600.00</div>
+            </div>
+        </div>
+        <div class="delivery-address">
+            <div><strong>Delivery address</strong></div>
+            <div>Antonia Dimeji</div>
+            <div>16 Adenuga Joseph Street</div>
+            <div>Shomolu, Lagos</div>
+        </div>
+        <div class="footer">
+            Feel free to contact us at <a href="mailto:help@bookatlas.com">help@bookatlas.com</a> if you have any
+            questions or complaints. Thanks for shopping with us.
+        </div>
+    </div>
 </body>
+
 </html>
