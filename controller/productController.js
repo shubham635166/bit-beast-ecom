@@ -1356,6 +1356,68 @@ exports.multiple_product_update = async (req, res) => {
     }
 };
 
+exports.filter_data = async (req, res) => {
+    let user_id = null;
+    
+    if (req.headers.cookie) {
+        const token = req.headers.cookie.split(';').find(part => part.trim().startsWith('token='));
+        if (token) {
+            const tokenValue = token.trim().substring(6);
+            const decodedData = jwt.verify(tokenValue, key.key);
+            user_id = decodedData.id;
+        }
+    }
+
+    const reviews = await Review.find();
+    const products = await Product.find();
+
+    // Create a map to store the total rating and count of reviews for each product
+    const productRatingMap = new Map();
+
+    // Calculate total rating and count of reviews for each product
+    reviews.forEach(review => {
+        const productId = review.product_id.toString();
+        const rating = review.rating;
+
+        if (!productRatingMap.has(productId)) {
+            productRatingMap.set(productId, { totalRating: 0, reviewCount: 0 });
+        }
+
+        const productRating = productRatingMap.get(productId);
+        productRating.totalRating += rating;
+        productRating.reviewCount++;
+    });
+
+    // Calculate average rating for each product and store in a map
+    const averageRatingMap = new Map();
+    productRatingMap.forEach((value, productId) => {
+        const averageRating = value.reviewCount > 0 ? Math.round((value.totalRating / value.reviewCount * 10)) / 10 : 0;
+        averageRatingMap.set(productId, averageRating);
+    });
+
+    // Associate average ratings with respective products and include review count
+    const productsWithAverageRating = products.map(product => {
+        const productId = product._id.toString();
+        const averageRating = averageRatingMap.has(productId) ? averageRatingMap.get(productId) : 0;
+        const reviewCount = productRatingMap.has(productId) ? productRatingMap.get(productId).reviewCount : 0;
+        return { ...product.toObject(), averageRating, reviewCount, inWishlist: false };
+    });
+
+    // Sort products by average rating
+    productsWithAverageRating.sort((a, b) => b.averageRating - a.averageRating);
+
+    if (user_id) {
+        const wish = await wishList.findOne({ user_id: user_id });
+        if (wish) {
+            const wishProduct = wish.products.map(product => product.product_id.toString());
+            productsWithAverageRating.forEach(product => {
+                product.inWishlist = wishProduct.some(wish_id => wish_id === product._id.toString());
+            });
+        }
+    }
+
+    return res.status(200).json({ status: true, total: productsWithAverageRating.length, product: productsWithAverageRating });
+};
 
 
 // { if (filter_by && filter_by.data_type === "all_time") {
