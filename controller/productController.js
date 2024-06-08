@@ -1369,9 +1369,9 @@ exports.filter_data = async (req, res) => {
     }
 
     const reviews = await Review.find();
-    const products = await Product.find();
+    const products = await Product.find().populate('brand_id category_id img_id');
 
-    // Create a map to store the total rating and count of reviews for each product
+    // Create a map to store the total rating and count of reviews for eackh product
     const productRatingMap = new Map();
 
     // Calculate total rating and count of reviews for each product
