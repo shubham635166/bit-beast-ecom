@@ -7,6 +7,7 @@ const Brand = require('../model/brandModel')
 const jwt = require('jsonwebtoken');
 const key = require('../middleware/secreteKey');
 const wishList = require('../model/wishListModel')
+const Order = require('../model/order.Model')
 
 // product
 
@@ -368,7 +369,7 @@ exports.productGet = async (req, res) => {
         }
 
         let matchStage = {
-            isDeleted : false
+            isDeleted: false
         };
 
 
@@ -1358,7 +1359,7 @@ exports.multiple_product_update = async (req, res) => {
 
 exports.filter_data = async (req, res) => {
     let user_id = null;
-    
+
     if (req.headers.cookie) {
         const token = req.headers.cookie.split(';').find(part => part.trim().startsWith('token='));
         if (token) {
@@ -1418,6 +1419,92 @@ exports.filter_data = async (req, res) => {
 
     return res.status(200).json({ status: true, total: productsWithAverageRating.length, product: productsWithAverageRating });
 };
+
+// exports.reviewProductGet = async (req, res) => {
+//     let user_id = null;
+
+//     if (req.headers.cookie) {
+//         const token = req.headers.cookie.split(';').find(part => part.trim().startsWith('token='));
+//         if (token) {
+//             const tokenValue = token.trim().substring(6);
+//             const decodedData = jwt.verify(tokenValue, key.key);
+//             user_id = decodedData.id;
+//         }
+//     }
+
+//     let Products = [];
+
+//     const orders = await Order.find({ user_id: user_id });
+//     const reviews = await Review.find({ user_id: user_id });
+//     const allProducts = await Product.find({ isDeleted: false }).populate('brand_id category_id img_id');
+
+//     if (user_id) {
+//         const orderedProductIds = orders.flatMap(order => order.order_Item.map(item => item.product_id.toString()));
+//         const reviewedProductIds = reviews.map(review => review.product_id.toString());
+
+//         Products = allProducts.map(product => {
+//             const productIdStr = product._id.toString();
+//             const isOrdered = orderedProductIds.includes(productIdStr);
+//             const isReviewed = reviewedProductIds.includes(productIdStr);
+//             return {
+//                 ...product._doc,
+//                 reviewed: isOrdered && isReviewed
+//             };
+//         });
+//     } else {
+//         Products = allProducts;
+//     }
+
+//     return res.status(200).json({ status: true, Products });
+// };
+
+exports.reviewProductGet = async (req, res) => {
+    let user_id = null;
+
+    if (req.headers.cookie) {
+        const token = req.headers.cookie.split(';').find(part => part.trim().startsWith('token='));
+        if (token) {
+            const tokenValue = token.trim().substring(6);
+            const decodedData = jwt.verify(tokenValue, key.key);
+            user_id = decodedData.id;
+        }
+    }
+
+    let Products = [];
+
+    const orders = await Order.find({ user_id: user_id });
+    const reviews = await Review.find({ user_id: user_id });
+    const allProducts = await Product.find({ isDeleted: false }).populate('brand_id category_id img_id');
+
+    if (user_id) {
+        // Get the product IDs from the user's orders
+        const orderedProductIds = orders.flatMap(order => order.order_Item.map(item => item.product_id.toString()));
+        // Get the product IDs from the user's reviews
+        const reviewedProductIds = reviews.map(review => review.product_id.toString());
+
+        Products = allProducts.map(product => {
+            const productIdStr = product._id.toString();
+            const isOrdered = orderedProductIds.includes(productIdStr);
+            const isReviewed = reviewedProductIds.includes(productIdStr);
+            if (isOrdered) {
+                return {
+                    ...product._doc,
+                    reviewed: isReviewed
+                };
+            } else {
+                return {
+                    ...product._doc
+                };
+            }
+        });
+    } else {
+        Products = allProducts;
+    }
+
+    return res.status(200).json({ status: true, total : Products.length , Products });
+};
+
+
 
 
 // { if (filter_by && filter_by.data_type === "all_time") {

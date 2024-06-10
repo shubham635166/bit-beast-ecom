@@ -1,7 +1,7 @@
 const app = require('express');
 const router = app.Router();
 
-const { product, productUpdate, productDelete, productGet, productIdWithGet, variationAdd, updateVariation, deleteVariation, getVariation, getVariationWithId , multipleDelete, allDelete , getRelatedProduct, filterProductPrice, productFilterDateWise, filter_Data, multiple_product_update, ttask, filter_data } = require('../controller/productController');
+const { product, productUpdate, productDelete, productGet, productIdWithGet, variationAdd, updateVariation, deleteVariation, getVariation, getVariationWithId , multipleDelete, allDelete , getRelatedProduct, filterProductPrice, productFilterDateWise, filter_Data, multiple_product_update, ttask, filter_data, reviewProductGet } = require('../controller/productController');
 
 const { user, login, userUpdate, getData, changePassword, userDelete, userData, captcha, getAllUserData, addGuestUser } = require('../controller/userController');
 
@@ -62,6 +62,7 @@ router.post('/product_averageRating' , filter_data)
 router.post('/relatedProduct',getRelatedProduct)
 router.post('/filterProductPrice',filterProductPrice)
 router.post('/dateWise',productFilterDateWise)
+router.post('/getReviewProduct' , reviewProductGet)
 
 //product variation
 

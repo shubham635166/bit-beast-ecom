@@ -571,42 +571,36 @@ exports.compare_sale = async (req, res) => {
 
 exports.findOrderReviewProduct = async (req, res) => {
     try {
+        // Fetch all reviews made by the user
         const reviews = await Review.find({ user_id: req.user._id });
-        const cartProducts = await Order.find({ user_id: req.user._id });
-        const returnRequests = await Return.find({ user_id: req.user._id });
 
-        // Initialize an empty cart object
-        let reviewedCartProducts = {};
+        // Fetch all orders made by the user
+        const cartProducts = await Order.find({ user_id: req.user._id }).populate('order_Item.product_id');
 
-        // Loop through each cart item
+        // Initialize an empty array to hold the products with their review status
+        let reviewedCartProducts = [];
+
+        // Loop through each order
         cartProducts.forEach(cartItem => {
-            const returnRequestForOrder = returnRequests.some(request => 
-                request.order_id && request.order_id.toString() === cartItem._id.toString() && request.type === 'order'
-            );
-
+            // Loop through each product in the order
             const reviewedProducts = cartItem.order_Item.map(product => {
+                // Check if a review exists for the current product
                 const reviewExists = reviews.some(review => 
                     review.product_id && review.product_id.toString() === product.product_id.toString()
                 );
-                const returnRequest = returnRequestForOrder || returnRequests.some(request => 
-                    request.order_item_id && request.order_item_id.toString() === product._id.toString() && request.type === 'product'
-                );
 
+                // Return the product with its review status
                 return { 
                     ...product.toObject(),
-                    reviewed: reviewExists,
-                    returnProductRequest: returnRequest
+                    reviewed: reviewExists
                 };
             });
 
-            // Add the reviewed products to the cart object
-            reviewedCartProducts = {
-                ...reviewedCartProducts,
-                order_item: reviewedProducts
-            };
+            // Add the reviewed products to the array
+            reviewedCartProducts.push(...reviewedProducts);
         });
 
-        // Send the response with the reviewed cart
+        // Send the response with the reviewed cart products
         res.status(200).json({ status: true, reviewedCartProducts });
     } catch (error) {
         res.status(500).json({ error: error.message });
