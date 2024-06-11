@@ -53,10 +53,10 @@ exports.user = async (req, res) => {
             pages, pages
           })
           await doc.save()
+          sendToken(guest, 200, res);
           return res.status(200).json({status:true , message : "user successfully add" , user:doc})
           const saved_user = await User.findOne({ email: email })
 
-          sendToken(guest, 200, res);
         } else {
           res.send({ "status": "failed", "message": "Password and Confirm Password doesn't match" })
         }
