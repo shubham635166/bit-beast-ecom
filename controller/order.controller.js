@@ -565,7 +565,7 @@ exports.compare_sale = async (req, res) => {
             return res.status(200).json({ status: false, message: "Invalid filter!" });
         }
     } catch (error) {
-        return res.status(500).json({ status: false, message: "Server error", error: error.message });
+        return res.status(200).json({ status: false, message: "Server error", error: error.message });
     }
 };
 
@@ -575,15 +575,15 @@ exports.findOrderReviewProduct = async (req, res) => {
         const reviews = await Review.find({ user_id: req.user._id });
 
         // Fetch all orders made by the user
-        const cartProducts = await Order.find({ user_id: req.user._id }).populate('order_Item.product_id');
+        const orderProducts = await Order.find({ user_id: req.user._id }).populate('order_Item.product_id');
 
         // Initialize an empty array to hold the products with their review status
         let reviewedCartProducts = [];
 
         // Loop through each order
-        cartProducts.forEach(cartItem => {
+        orderProducts.forEach(orderItem => {
             // Loop through each product in the order
-            const reviewedProducts = cartItem.order_Item.map(product => {
+            const reviewedProducts = orderItem.order_Item.map(product => {
                 // Check if a review exists for the current product
                 const reviewExists = reviews.some(review => 
                     review.product_id && review.product_id.toString() === product.product_id.toString()
@@ -603,6 +603,44 @@ exports.findOrderReviewProduct = async (req, res) => {
         // Send the response with the reviewed cart products
         res.status(200).json({ status: true, reviewedCartProducts });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(200).json({ error: error.message });
+    }
+};
+
+exports.preViewOrder = async (req, res) => {
+    try {
+        const { order_id } = req.body;
+
+        if (!mongoose.isValidObjectId(order_id)) {
+            return res.status(200).json({ status: false, message: "Invalid order_id!" });
+        }
+
+        const order = await Order.findOne({ _id: order_id, user_id: req.user._id });
+
+        if (!order) {
+            return res.status(200).json({ status: false, message: "Order not found!" });
+        }
+
+        const reviews = await Review.find({ order_id: order._id, user_id: req.user._id });
+        const productReturn = await Return.find({ order_id: order._id, user_id: req.user._id });
+
+        const orderWithReviews = order.order_Item.map(item => {
+
+            const isOrderReturn = productReturn.some(returnReq => returnReq.type === 'order');
+            const review = reviews.find(review => review.product_id.toString() === item.product_id.toString());
+            const returnRequest = isOrderReturn ? true : productReturn.some(returnReq => returnReq.order_item_id.toString() === item.product_id.toString());
+
+            return {
+                ...item.toObject(),
+                review: review ? true : false,
+                returnRequest: returnRequest
+            };
+        });
+
+        return res.status(200).json({ status: true, order: { ...order.toObject(), order_Item: orderWithReviews } });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ status: false, message: "An error occurred while processing your request." });
     }
 };

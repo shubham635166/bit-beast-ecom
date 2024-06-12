@@ -92,7 +92,7 @@ exports.login = async (req, res) => {
           sendToken(user, 200, res);
 
         } else {
-          res.send({ "status": "failed", "message": "Email or Password is not Valid" })
+          return res.json({ status: false , message: "Email or Password is not Valid" })
         }
       } else {
         res.status(200).send({ success: false, message: "User are not register" })

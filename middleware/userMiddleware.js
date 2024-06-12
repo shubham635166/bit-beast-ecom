@@ -4,13 +4,13 @@ const key = require('./secreteKey')
 
 exports.protect = async (req, res, next) => {
   const token = req.headers.cookie;
+  if (!token) {
+      return res.json({ status: "failed", message: "Please Login to access this resource" });
+      }
 
-    if (!token) {
-        return res.json({ status: "failed", message: "Please Login to access this resource" });
-    }
-    
-    // Extracting the token part from the cookie
-    const tokenParts = token.split(';').find(part => part.trim().startsWith('token='));
+      // Extracting the token part from the cookie
+      const tokenParts = token.split(';').find(part => part.trim().startsWith('token='));   
+                                      
     if (!tokenParts) {
         return res.status(401).json({ status: "failed", message: "Invalid token format" });
     }

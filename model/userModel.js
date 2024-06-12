@@ -63,7 +63,7 @@ user.methods.getJWTToken = function (){
     return jwt.sign({
         id: this.id,
         email: this.email
-    }, key.key)
+    }, key.key , { expiresIn: '7d' })
 }
 
 const User = new mongoose.model("User", user)

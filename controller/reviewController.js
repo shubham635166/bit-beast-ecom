@@ -4,8 +4,8 @@ const Cart = require('../model/cart')
 
 exports.addReview = async (req, res) => {
     try {
-    const { product_id, cart_id, rating, note, isDeleted } = req.body
-    const validation = ["product_id", "cart_id", "rating", "note", "isDeleted"]
+    const { product_id, order_id, rating, note, isDeleted } = req.body
+    const validation = ["product_id", "order_id", "rating", "note", "isDeleted"]
 
         for (let i = 0; i < validation.length; i++) {
 
@@ -16,8 +16,8 @@ exports.addReview = async (req, res) => {
                 }
             }
 
-    if (mongoose.isValidObjectId(product_id) && mongoose.isValidObjectId(cart_id)) {
-        const cart = await Cart.findOne({ _id: cart_id })
+    if (mongoose.isValidObjectId(product_id) && mongoose.isValidObjectId(order_id)) {
+        const cart = await Cart.findOne({ _id: order_id })
         if (cart) {
 
             const product = cart.products.find(product => product.product_Id.equals(product_id));
@@ -27,7 +27,7 @@ exports.addReview = async (req, res) => {
                     const review = await Review({
                         user_id: req.user._id,
                         product_id,
-                        cart_id,
+                        order_id,
                         rating: Math.round(rating),
                         note,
                         isDeleted
@@ -59,8 +59,8 @@ catch (error) {
 
 exports.updateReview = async (req, res) => {
     try {   
-    const { review_id, product_id, cart_id, rating, note , isDeleted} = req.body
-    const validation = ["product_id", "review_id","cart_id", "rating", "note", "isDeleted"]
+    const { review_id, product_id, order_id, rating, note , isDeleted} = req.body
+    const validation = ["product_id", "review_id","order_id", "rating", "note", "isDeleted"]
 
         for (let i = 0; i < validation.length; i++) {
 
@@ -79,7 +79,7 @@ exports.updateReview = async (req, res) => {
                 review.rating = rating,
                 review.note = note,
                 review.product_id = product_id,
-                review.cart_id = cart_id,
+                review.order_id = order_id,
                 review.isDeleted = isDeleted,
                 review.updatedAt = new Date()
 

@@ -9,7 +9,7 @@ const review = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product'
     },
-    cart_id: {
+    order_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Cart'
     },
