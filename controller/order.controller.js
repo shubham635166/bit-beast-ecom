@@ -627,7 +627,9 @@ exports.preViewOrder = async (req, res) => {
         const orderWithReviews = order.order_Item.map(item => {
 
             const isOrderReturn = productReturn.some(returnReq => returnReq.type === 'order');
+
             const review = reviews.find(review => review.product_id.toString() === item.product_id.toString());
+            
             const returnRequest = isOrderReturn ? true : productReturn.some(returnReq => returnReq.order_item_id.toString() === item.product_id.toString());
 
             return {
